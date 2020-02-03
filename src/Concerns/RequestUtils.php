@@ -216,4 +216,15 @@ trait RequestUtils
 
         return false;
     }
+
+    /**
+     * Retrieve a server variable from the request.
+     *
+     * @param null|mixed $default
+     * @return null|array|string
+     */
+    public function server(string $key, $default = null)
+    {
+        return parent::server(strtolower($key), $default);
+    }
 }
