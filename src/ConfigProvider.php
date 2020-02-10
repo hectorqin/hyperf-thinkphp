@@ -58,20 +58,11 @@ class ConfigProvider
             }
 
             if (is_string($field)) {
-                if (strpos($field, ',')) {
-                    $field = array_map('trim', explode(',', $field));
-                } else {
-                    $field = empty($order) ? $field : [$field => $order];
-                }
-            }
-
-            if (is_array($field)) {
-                $this->{$this->unions ? 'unionOrders' : 'orders'} = array_merge($this->{$this->unions ? 'unionOrders' : 'orders'}, $field);
+                $this->orderBy($field, $order);
             } else {
-                $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
-                    'column' => $field,
-                    'direction' => 'asc',
-                ];;
+                foreach ($field as $name => $value) {
+                    $this->orderBy($name, $value);
+                }
             }
 
             return $this;
