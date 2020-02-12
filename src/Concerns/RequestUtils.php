@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Z\HyperfThinkphp\Concerns;
 
+use Hyperf\Utils\Context;
+
 trait RequestUtils
 {
 
@@ -54,6 +56,46 @@ trait RequestUtils
         }
 
         return $result;
+    }
+
+    /**
+     * 覆盖中间件参数设置
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function __set($key, $value)
+    {
+        Context::override(__CLASS__ . '.properties', function($data) use($key, $value) {
+            $data = $data ?? [];
+            $data[$key] = $value;
+            return $data;
+        });
+        return $this->storeRequestProperty($key, $value);
+    }
+
+    /**
+     * 获取中间件参数
+     * @return array
+     */
+    protected function getRequestPropertys()
+    {
+        return Context::get(__CLASS__ . '.properties') ?? [];
+    }
+
+    /**
+     * 获取所有请求参数，支持中间件覆盖请求参数
+     *
+     * @param bool $origin 是否获取原结果
+     * @return array
+     */
+    public function all($origin = false): array
+    {
+        $data = $this->getInputData() ?? [];
+        if ($origin) {
+            return $data;
+        }
+        return array_merge($data, $this->getRequestPropertys());
     }
 
     /**
